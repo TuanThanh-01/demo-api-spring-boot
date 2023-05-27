@@ -1,0 +1,32 @@
+version: '3.8'
+
+services:
+  my-mysql:
+    image: mysql:8.0.25
+    environment:
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_DATABASE: mydb
+    ports:
+      - "3307:3306"
+    volumes:
+      - mysql-data:/var/lib/mysql/data
+    networks:
+      - my-network
+  spring-boot-app:
+    build: .
+    ports:
+      - "8088:8080"
+    depends_on:
+      - my-mysql
+    networks:
+      - my-network
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://my-mysql:3307/mydb
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: password
+volumes:
+  mysql-data:
+networks:
+  my-network:
+    driver: bridge
+
